@@ -101,7 +101,7 @@ set tabstop=4
 set completeopt=longest,menu
 inoremap ' ''<ESC>i
 inoremap " ""<ESC>i
-inoremap < <><ESC>i
+" inoremap < <><ESC>i
 inoremap ( ()<ESC>i
 inoremap [ []<ESC>i
 inoremap { {<CR>}<ESC>O
@@ -138,12 +138,12 @@ func SetTitle()
                 call append(line(".")+5, "")
         endif
         if &filetype == 'cpp'
-                call append(line(".")+6, "#include<iostream>")
+                call append(line(".")+6, "#include <iostream>")
                 call append(line(".")+7, "using namespace std;")
                 call append(line(".")+8, "")
         endif
         if &filetype == 'c'
-                call append(line(".")+6, "#include<stdio.h>")
+                call append(line(".")+6, "#include <stdio.h>")
                 call append(line(".")+7, "")
         endif
         " append after creating new file
