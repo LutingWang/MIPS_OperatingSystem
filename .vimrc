@@ -10,8 +10,8 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'vim-scripts/taglist.vim'
-Plugin 'tomasr/molokai'
-" Plugin 'vim-syntastic/syntastic'
+Plugin 'ludovicchabant/vim-gutentags'
+Plugin 'octol/vim-cpp-enhanced-highlight'
 Plugin 'Valloric/YouCompleteMe'
 
 call vundle#end()
@@ -22,7 +22,7 @@ let g:NERDTreeWinSize=20
 " let g:nerdtree_tabs_open_on_console_startup=1
 
 " taglist
-set tags=~/tags;tags;/
+set tags=~/.cache/tags/*.tags
 let Tlist_File_Fold_Auto_Close=1
 let Tlist_Exit_OnlyWindow=1
 let Tlist_Ctags_Cmd="/usr/local/bin/ctags"
@@ -30,8 +30,22 @@ let Tlist_Auto_Open=1
 let Tlist_Use_Right_Window=1
 let Tlist_WinWidth=30
 
-" molokai
-let g:molokai_original=1
+" gutentags
+let g:gutentags_project_root=['.root', '.svn', '.git', '.project']
+let g:gutentags_ctags_tagfile='.tags'
+let g:gutentags_ctags_extra_args=['--fields=+niazS', '--extra=+q', '--c++-kinds=+pxI', '--c-kinds=+px']
+let s:vim_tags = expand('~/.cache/tags')
+let g:gutentags_cache_dir = s:vim_tags
+if !isdirectory(s:vim_tags)
+	silent! call mkdir(s:vim_tags, 'p')
+endif
+
+" vim-cpp-enhanced-highlight
+let g:cpp_class_scope_highlight=1
+let g:cpp_member_variable_highlight=1
+let g:cpp_class_decl_highlight=1
+let g:cpp_concepts_highlight=1
+let g:cpp_experimental_simple_template_highlight=1
 
 " YouCompleteMe
 let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
@@ -47,28 +61,25 @@ let g:ycm_collect_identifiers_from_comments_and_strings=1
 """"""""""
 " basics "
 """"""""""
-set nu
+set number
 set ruler
-set showcmd
+set cursorcolumn
+set cursorline
 set scrolloff=3
-set t_Co=256
+set showcmd
+set laststatus=1
+set showmatch " show matched parenthesis
 
 set mouse=a
+set whichwrap=<,>,[,] " allow cursor to move between lines
 set foldenable
 set foldmethod=syntax
-
-set whichwrap=b,s,<,>,[,]
-set wildmenu
-set laststatus=1
-
-set showmatch
 set selectmode=mouse,key
-set ignorecase
-set clipboard+=unnamed
+set wildmenu " command line completion
 
-set gdefault
 set encoding=utf-8
 set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,utf-16,big5,e
+autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java exec ":call SetTitle()"
 
 """""""""""""""
 " key mapping "
@@ -81,25 +92,28 @@ map <F10> <plug>NERDTreeTabsToggle <CR>
 map <F11> :TlistToggle<CR>
 map <F12> :shell<CR>
 
-"""""""""""""""""""""""""""""""""
-" Switch syntax highlighting on "
-"""""""""""""""""""""""""""""""""
+"""""""""""""
+" highlight "
+"""""""""""""
+set t_Co=256
 syntax on
-autocmd BufRead,BufNewFile *.md set filetype=markdown
-highlight NonText guibg=#060606
-highlight Folded  guibg=#0A0A0A guifg=#9090D0
-highlight Search ctermbg=220 ctermfg=Black
-highlight Statement ctermfg=39
-highlight LineNr ctermfg=Green
-highlight PmenuSel ctermfg=Black
-
-""""""""""""""""""""""""""
-" highlight current line "
-""""""""""""""""""""""""""
-set cursorcolumn
-set cursorline
-highlight CursorLine cterm=NONE ctermbg=30 ctermfg=NONE guibg=NONE guifg=NONE
-highlight CursorColumn cterm=NONE ctermbg=30 ctermfg=NONE guibg=NONE guifg=NONE
+hi SpecialKey		cterm=bold		ctermfg=81
+hi Search					ctermfg=0	ctermbg=220
+hi LineNr					ctermfg=Green
+hi CursorLineNr		cterm=none		ctermfg=11
+hi StatusLine		cterm=bold,reverse
+hi StatusLineNC		cterm=reverse
+hi Folded					ctermfg=14	ctermbg=242
+hi FoldColumn					ctermfg=14	ctermbg=242
+hi Pmenu					ctermfg=Black	ctermbg=White
+hi PmenuSel					ctermfg=Black	ctermbg=Gray
+hi CursorLine		cterm=none				ctermbg=242
+hi CursorColumn							ctermbg=242
+hi Comment					ctermfg=32
+hi Identifier		cterm=bold		ctermfg=14
+hi Statement					ctermfg=100
+hi PreProc					ctermfg=5
+hi Type						ctermfg=113
 
 """"""""""
 " indent "
@@ -134,7 +148,6 @@ func SkipPair()
     endif
 endfunc
 
-autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java exec ":call SetTitle()"
 func SetTitle()
 	if &filetype == 'sh'
 		call setline(1,"\###############################################")
